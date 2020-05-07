@@ -255,13 +255,13 @@ Event model
 
 ### Trello
 
-Link to Trello
+[Repository Link] (https://trello.com/invite/b/9Y789hDx/5fd781d3a066caf1add75b8e9eba1ea4/facein-backend)
 
 ### Git
 
 The url to your repository and to your deployed project
 
-[Repository Link](http://github.com/)
+[Repository Link](https://github.com/msallito510/faceIn-back)
 
 [Deploy Link](http://heroku.com/)
 
