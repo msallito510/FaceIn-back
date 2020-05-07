@@ -253,6 +253,10 @@ Event model
 
 ## Links
 
+### Mock
+
+[Figma](https://www.figma.com/proto/2yGSTEQmKitxZOzLqsdedJ/Home?node-id=1%3A2&scaling=scale-down)
+
 ### Trello
 
 [Trello Link](https://trello.com/invite/b/9Y789hDx/5fd781d3a066caf1add75b8e9eba1ea4/facein-backend)
