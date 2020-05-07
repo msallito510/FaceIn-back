@@ -255,7 +255,7 @@ Event model
 
 ### Trello
 
-[Repository Link] (https://trello.com/invite/b/9Y789hDx/5fd781d3a066caf1add75b8e9eba1ea4/facein-backend)
+[Trello Link](https://trello.com/invite/b/9Y789hDx/5fd781d3a066caf1add75b8e9eba1ea4/facein-backend)
 
 ### Git
 
