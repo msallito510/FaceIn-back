@@ -96,8 +96,8 @@ router.post('/add', checkIfLoggedIn, async (req, res, next) => {
   try {
     const user = await User.findById(_id);
     const userId = user._id;
-    const institutionId = user.hasInstitution._id;
-    if (user.hasInstitution._id === true) {
+    if (!!user.hasInstitution) {
+      const institutionId = user.hasInstitution._id;
       const event = await Event.create({
         owner: userId,
         title,
@@ -176,8 +176,8 @@ router.put('/:eventId/edit', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
+//TODO: solo para owner
+
 router.delete('/:eventId/delete', checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
@@ -212,7 +212,6 @@ router.delete('/:eventId/delete', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
 router.get('/:eventId/add-like', checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
@@ -252,7 +251,7 @@ router.get('/:eventId/add-like', checkIfLoggedIn, async (req, res, next) => {
     }
 
     if (findEventWithLike.likes.length === 0 || (findEventWithLike.likes.length !== 0 && userIdNotFound === true)) {
-      console.log('uno');
+
       const like = await Like.create({
         likeGivenBy: userId,
         likeForEvent: eventId,
@@ -262,7 +261,7 @@ router.get('/:eventId/add-like', checkIfLoggedIn, async (req, res, next) => {
       await Event.findByIdAndUpdate(eventId, { numberOfLikes: findEventWithLike.likes.length + 1 }, { new: true });
       res.json(like);
     } else {
-      console.log('tres');
+
       const deleteLike = await Like.findByIdAndDelete(getLikeIdToDelete());
       await User.findByIdAndUpdate(userId, { $pull: { likesGiven: deleteLike._id } }, { new: true });
       await Event.findByIdAndUpdate(eventId, { $pull: { likes: deleteLike._id } }, { new: true });
@@ -274,7 +273,6 @@ router.get('/:eventId/add-like', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
 router.get('/:eventId/register', checkIfLoggedIn, async (req, res, next) => {
   const { eventId } = req.params;
   const { _id } = req.session.currentUser;

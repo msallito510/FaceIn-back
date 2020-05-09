@@ -8,7 +8,7 @@ const User = require('../models/User');
 const bcryptSalt = 10;
 
 const router = express.Router();
-// works
+
 router.get('/whoami', (req, res, next) => {
   if (req.session.currentUser) {
     res.status(200).json(req.session.currentUser);
@@ -16,10 +16,10 @@ router.get('/whoami', (req, res, next) => {
     res.status(401).json({ code: 'unauthorized' });
   }
 });
-// works
+
 router.post('/signup', checkUsernameAndPasswordNotEmpty, async (req, res, next) => {
   const { username, password, email } = res.locals.auth;
-  // selfie important!
+  // TODO: selfie important!
   try {
     const user = await User.findOne({ username });
     if (user) {
@@ -36,7 +36,7 @@ router.post('/signup', checkUsernameAndPasswordNotEmpty, async (req, res, next) 
     next(error);
   }
 });
-// works
+
 router.post('/login', checkUsernameAndPasswordNotEmpty, async (req, res, next) => {
   const { username, password } = res.locals.auth;
   try {
@@ -53,7 +53,7 @@ router.post('/login', checkUsernameAndPasswordNotEmpty, async (req, res, next) =
     next(error);
   }
 });
-// works
+
 router.get('/logout', (req, res, next) => {
   req.session.destroy(err => {
     if (err) {

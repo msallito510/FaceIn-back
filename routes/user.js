@@ -14,8 +14,6 @@ const Rating = require('../models/Rating'); // populate
 const Participant = require('../models/Participant'); // populate
 const Institution = require('../models/Institution'); // populate
 
-// para admin y user
-// works
 router.get('/', checkIfLoggedIn, async (req, res, next) => {
   try {
     const users = await User.find({ role: 'user' })
@@ -50,8 +48,6 @@ router.get('/', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// para admin y user
-// works
 router.get('/:userId', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   try {
@@ -91,8 +87,6 @@ router.get('/:userId', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para user
-// works
 router.put('/:userId/edit', checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
