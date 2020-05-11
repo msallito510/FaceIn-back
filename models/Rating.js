@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
@@ -7,7 +7,7 @@ const ratingSchema = new Schema(
   {
     title: {
       type: String,
-      required: [true, 'Short title missing 🙂.'],
+      required: [true, "Short title missing 🙂."],
     },
     description: {
       type: String,
@@ -17,7 +17,7 @@ const ratingSchema = new Schema(
       type: Number,
       enum: [1, 2, 3, 4, 5],
       default: 4,
-      required: [true, 'Oops: Stars missing 🙂.'],
+      required: [true, "Oops: Stars missing 🙂."],
     },
     writtenOn: {
       type: Date,
@@ -25,21 +25,21 @@ const ratingSchema = new Schema(
     },
     ratingGivenBy: {
       type: ObjectId,
-      ref: 'User',
+      ref: "User",
     },
-    ratingForInstitution: {
+    ratingForPlace: {
       type: ObjectId,
-      ref: 'Institution',
+      ref: "Place",
     },
   },
   {
     timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     },
-  },
+  }
 );
 
-const Rating = mongoose.model('Rating', ratingSchema);
+const Rating = mongoose.model("Rating", ratingSchema);
 
 module.exports = Rating;

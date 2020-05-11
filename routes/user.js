@@ -12,12 +12,12 @@ const Tag = require("../models/Tag"); // populate
 const Like = require("../models/Like"); // populate
 const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
-const Institution = require("../models/Institution"); // populate
+const Place = require("../models/Place"); // populate
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const users = await User.find({ role: "user" })
-      .populate("hasInstitution")
+      .populate("hasPlace")
       .populate({
         path: "eventsOwner",
         populate: { path: "owner" },
@@ -52,7 +52,7 @@ router.get("/:userId", checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   try {
     const user = await User.findById(userId)
-      .populate("hasInstitution")
+      .populate("hasPlace")
       .populate({
         path: "eventsOwner",
         populate: { path: "owner" },

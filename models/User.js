@@ -42,9 +42,9 @@ const userSchema = new Schema(
       type: String,
       // required: [true, 'We need your selfie. Show us your best side 😃.'],
     },
-    hasInstitution: {
+    hasPlace: {
       type: ObjectId,
-      ref: "Institution",
+      ref: "Place",
     },
     eventsOwner: [
       {

@@ -1,4 +1,3 @@
-
 # FaceIn:
 
 ## Description
@@ -37,7 +36,7 @@ Bring together (almost) all social dance spots worldwide.
 
 **User profile** - As a user I want to update my profile and upload an avatar and selfie, and see other users and their profile with their events listed on their profile.
 
-**Dancing spot / institution / school** - As a user I want to register my dancing spot on a map and link my events to that place.
+**Dancing spot / place / school** - As a user I want to register my dancing spot on a map and link my events to that place.
 
 **Rating** - As a user I would like to write a comment and rate a dancing spot.
 
@@ -65,42 +64,42 @@ Calendar: show a calender that always loads the events from the current day
 
 ### Endpoints
 
-| Method | Path                                         | Description                                 | Body                                                                                             |
-| :----: | -------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-|  GET   | `/users`                                     | get all users                               |                                                                                                  |
-|  GET   | `/users/:userId`                             | get one user                                |                                                                                                  |
-|  PUT   | `/users/edit`                                | user can edit his profile                   | `{ username, email, firstName, familyName, avatar, selfie, password }`                           |
-| DELETE | `/admin/:userId/delete`                      | admin can delete user                       |                                                                                                  |
-| DELETE | `/admin/:eventId/admin-delete`               | admin can delete event                      |                                                                                                  |
-| DELETE | `/admin/:institutionId/delete-admin`         | admin can delete dancing place              |                                                                                                  |
-|  GET   | `/institutions`                              | get all dancing spots                       |                                                                                                  |
-|  GET   | `/institutions/:institutionId`               | get one dancing spot                        |                                                                                                  |
-|  POST  | `/institution/add`                           | user can add a dancing place                | `{ institutionName, image, address }`                                                            |
-|  PUT   | `/institutions/edit`                         | user can update dancing place               | `{ institutionName, image, address }`                                                            |
-| DELETE | `/institutions/delete`                       | user-owner can delete dancing place         |                                                                                                  |
-|  POST  | `/institutions/:institutionId/add-rating`    | add and update rating to a dancing place    | `{ title, description, stars }`                                                                  |
-| DELETE | `/institutions/:institutionId/delete-rating` | user of rating can delete it                |                                                                                                  |
-|  GET   | `/events`                                    | get all events                              |                                                                                                  |
-|  GET   | `/events`                                    | get all events                              |                                                                                                  |
-|  GET   | `/events/:eventId`                           | get one event                               |                                                                                                  |
-|  POST  | `/events/add`                                | user can add an event                       | `{ title, description, frequency, dateStart, dateEnd, timeStart, timeEnd, price, image, tagId }` |
-|  PUT   | `/events/edit`                               | update an event                             | `{ title, description, frequency, dateStart, dateEnd, timeStart, timeEnd, price, image, tagId }` |
-| DELETE | `/events/delete`                             | owner of the event can delete the event     |                                                                                                  |
-|  GET   | `/events/eventId/add-like`                   | like / unlike an event                      |                                                                                                  |
-|  GET   | `/events/eventId/register`                   | admin can scan face of participant          |                                                                                                  |
-|  GET   | `/tags`                                      | get all tags                                |                                                                                                  |
-|  GET   | `/tags/:tagId`                               | get one tag                                 |                                                                                                  |
-|  POST  | `/tags/add`                                  | admin can add a tag                         | `{ tagName }`                                                                                    |
-| DELETE | `/tags/:tagId/delete`                        | admin can delete tag                        |                                                                                                  |
-|  GET   | `/likes`                                     | get all likes                               |                                                                                                  |
-|  GET   | `/likes/:likeId`                             | get one like                                |                                                                                                  |
-|  GET   | `/ratings`                                   | get all ratings                             |                                                                                                  |
-|  GET   | `/ratings/:ratingId`                         | get one rating                              |                                                                                                  |
-| DELETE | `/ratings/delete`                            | event-owner OR admin can delete rating      |                                                                                                  |
-|  GET   | `/participants`                              | get all participants registered in an event |                                                                                                  |
-|  GET   | `/participants/:participantId`               | get one participant                         |                                                                                                  |
-|  PUT   | `/participants/:participantsId/scan`         | event-owner can scan face and accept user   | `{ faceScanned }`                                                                                |
-| DELETE | `/participants/:participantId/delete`        | event-owner can delete participant          |                                                                                                  |
+| Method | Path                                  | Description                                 | Body                                                                                             |
+| :----: | ------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+|  GET   | `/users`                              | get all users                               |                                                                                                  |
+|  GET   | `/users/:userId`                      | get one user                                |                                                                                                  |
+|  PUT   | `/users/edit`                         | user can edit his profile                   | `{ username, email, firstName, familyName, avatar, selfie, password }`                           |
+| DELETE | `/admin/:userId/delete`               | admin can delete user                       |                                                                                                  |
+| DELETE | `/admin/:eventId/admin-delete`        | admin can delete event                      |                                                                                                  |
+| DELETE | `/admin/:placeId/delete-admin`        | admin can delete dancing place              |                                                                                                  |
+|  GET   | `/places`                             | get all dancing spots                       |                                                                                                  |
+|  GET   | `/places/:placeId`                    | get one dancing spot                        |                                                                                                  |
+|  POST  | `/place/add`                          | user can add a dancing place                | `{ placeName, image, address }`                                                                  |
+|  PUT   | `/places/edit`                        | user can update dancing place               | `{ placeName, image, address }`                                                                  |
+| DELETE | `/places/delete`                      | user-owner can delete dancing place         |                                                                                                  |
+|  POST  | `/places/:placeId/add-rating`         | add and update rating to a dancing place    | `{ title, description, stars }`                                                                  |
+| DELETE | `/places/:placeId/delete-rating`      | user of rating can delete it                |                                                                                                  |
+|  GET   | `/events`                             | get all events                              |                                                                                                  |
+|  GET   | `/events`                             | get all events                              |                                                                                                  |
+|  GET   | `/events/:eventId`                    | get one event                               |                                                                                                  |
+|  POST  | `/events/add`                         | user can add an event                       | `{ title, description, frequency, dateStart, dateEnd, timeStart, timeEnd, price, image, tagId }` |
+|  PUT   | `/events/edit`                        | update an event                             | `{ title, description, frequency, dateStart, dateEnd, timeStart, timeEnd, price, image, tagId }` |
+| DELETE | `/events/delete`                      | owner of the event can delete the event     |                                                                                                  |
+|  GET   | `/events/eventId/add-like`            | like / unlike an event                      |                                                                                                  |
+|  GET   | `/events/eventId/register`            | admin can scan face of participant          |                                                                                                  |
+|  GET   | `/tags`                               | get all tags                                |                                                                                                  |
+|  GET   | `/tags/:tagId`                        | get one tag                                 |                                                                                                  |
+|  POST  | `/tags/add`                           | admin can add a tag                         | `{ tagName }`                                                                                    |
+| DELETE | `/tags/:tagId/delete`                 | admin can delete tag                        |                                                                                                  |
+|  GET   | `/likes`                              | get all likes                               |                                                                                                  |
+|  GET   | `/likes/:likeId`                      | get one like                                |                                                                                                  |
+|  GET   | `/ratings`                            | get all ratings                             |                                                                                                  |
+|  GET   | `/ratings/:ratingId`                  | get one rating                              |                                                                                                  |
+| DELETE | `/ratings/delete`                     | event-owner OR admin can delete rating      |                                                                                                  |
+|  GET   | `/participants`                       | get all participants registered in an event |                                                                                                  |
+|  GET   | `/participants/:participantId`        | get one participant                         |                                                                                                  |
+|  PUT   | `/participants/:participantsId/scan`  | event-owner can scan face and accept user   | `{ faceScanned }`                                                                                |
+| DELETE | `/participants/:participantId/delete` | event-owner can delete participant          |                                                                                                  |
 
 ### Auth
 
@@ -125,7 +124,7 @@ User model
 	familyName: String;
 	avatar: String;
 	selfie: String;
-	hasInstitution: ObjectId<Institution>;
+	hasPlace: ObjectId<Place>;
 	eventsOwner: ObjectId<Event>;
 	participantEvents: ObjectId<Participant>;
 	ratingsGiven: ObjectId<Rating>;
@@ -133,14 +132,14 @@ User model
 }
 ```
 
-Institution model
+Place model
 
 ```javascript
 {
-	institutionName: String;
+	placeName: String;
 	image: String;
-  institutionOwner: ObjectId<User>;
-  institutionHasEvents: ObjectId<Event>;
+  placeOwner: ObjectId<User>;
+  placeHasEvents: ObjectId<Event>;
   ratings: ObjectId<Rating>;
 	type: String, default: 'Feature';
 	geometry: {
@@ -202,9 +201,9 @@ Event model
     image: {
       type: String,
     },
-    belongsToInstitution: {
+    belongsToPlace: {
       type: ObjectId,
-      ref: 'Institution',
+      ref: 'Place',
       required: true,
     },
     tag: {
@@ -240,9 +239,9 @@ Event model
 |         EventsDetails          | `/events/:eventId`                               | details of the event                                                                                                 |
 |            Profile             | `/:userId`                                       | protected view: user profile with all likes and ratings that he gave to an event, all his events and his dancingspot |
 |          Edit Profile          | `/:userId/edit`                                  | protected view: user can update his details                                                                          |
-|        Add Institution         | `/:userId/add-spot`                              | protected view: user can add one dancing spot                                                                        |
+|           Add Place            | `/:userId/add-spot`                              | protected view: user can add one dancing spot                                                                        |
 |           Add Event            | `/:userId/add-event`                             | protected view: user can add an event                                                                                |
-|       Update Institution       | `/:userId/:institutionId/update-spot`            | protected view: user can edit spot                                                                                   |
+|          Update Place          | `/:userId/:placeId/update-spot`                  | protected view: user can edit spot                                                                                   |
 |          Update Event          | `/:userId/events/:eventId/update-event`          | protected view: user can edit event                                                                                  |
 |             Search             | `/events/search`                                 | search for an event and filter with tags                                                                             |
 |             Search             | `/events/:eventId/register`                      | register for an event                                                                                                |
