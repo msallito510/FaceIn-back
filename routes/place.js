@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
 
@@ -11,6 +12,11 @@ const Like = require("../models/Like"); // populate
 const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
+
+const getCoordinates = axios.create({
+  baseURL: process.env.GEOCODER_BASE_URL,
+  withCredentials: true,
+});
 
 // para admin y user
 // works
@@ -57,18 +63,29 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const {
     placeName,
+    address,
+    city,
+    country,
     // image,
-    // direccion,
   } = req.body;
   try {
     const user = await User.findById(_id);
     const userId = user._id;
     if (user.hasPlace === undefined) {
+      const addressQuery = `${address}, ${city}, ${country}`;
+      const coordinates = await getCoordinates.get(
+        `/geocode.json?apiKey=${process.env.GEOCODER_API_KEY}&searchtext=${addressQuery}`
+      );
+      const coordinatesLatLong = coordinates.data.Response.View[0].Result[0].Location.DisplayPosition;
+
       const place = await Place.create({
         placeName,
         // image,
         placeOwner: userId,
-        // direccion,
+        address,
+        city,
+        country,
+        coordinatesLatLong,
       });
       await User.findByIdAndUpdate(
         userId,
@@ -99,17 +116,27 @@ router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
     const {
       placeName,
       // image,
-      // direccion,
+      address,
+      city,
+      country,
     } = req.body;
     if (userId.toString() === findPlace.placeOwner._id.toString()) {
+      const addressQuery = `${address}, ${city}, ${country}`;
+      const coordinates = await getCoordinates.get(
+        `/geocode.json?apiKey=${process.env.GEOCODER_API_KEY}&searchtext=${addressQuery}`
+      );
+      const coordinatesLatLong = coordinates.data.Response.View[0].Result[0].Location.DisplayPosition;
       const place = await Place.findByIdAndUpdate(
         placeId,
         {
           placeName,
           // image,
-          // direccion,
+          address,
+          city,
+          country,
+          coordinatesLatLong,
         },
-        { new: true }
+        { new: true },
       );
       res.json(place);
     }
