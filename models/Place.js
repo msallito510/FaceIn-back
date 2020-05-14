@@ -31,16 +31,31 @@ const placeSchema = new Schema(
       },
     ],
     type: { type: String, default: "Feature" },
-    geometry: {
-      type: {
-        type: String,
-        default: "Point",
-      },
-      coordinates: {
-        type: [Number], // lng, lat
-        required: true,
-      },
+    address: {
+      type: String,
+      required: true,
     },
+    city: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+    coordinatesLatLong: {
+      type: Object,
+    },
+    // geometry: {
+    //   type: {
+    //     type: String,
+    //     default: "Point",
+    //   },
+    //   coordinates: {
+    //     type: [Number], // lng, lat
+    //     required: true,
+    //   },
+    // },
   },
   {
     timestamps: {
