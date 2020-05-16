@@ -324,7 +324,7 @@ router.get("/:eventId/register", checkIfLoggedIn, async (req, res, next) => {
   const participantId = findUser._id;
   try {
     const alreadyParticipantInEvent = await Participant.find({ participant: participantId, event: eventId });
-    console.log(alreadyParticipantInEvent)
+
     if (alreadyParticipantInEvent.length === 0) {
       const participant = await Participant.create({
         participant: participantId,
