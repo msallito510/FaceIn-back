@@ -101,7 +101,7 @@ router.delete(
         );
         await Event.findByIdAndUpdate(
           eventId,
-          { $pull: { participant: participant._id } },
+          { $pull: { participants: participant._id } },
           { new: true }
         );
         res.json(deleteParticipant);
