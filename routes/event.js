@@ -334,7 +334,7 @@ router.get("/:eventId/register", checkIfLoggedIn, async (req, res, next) => {
     );
     await Event.findByIdAndUpdate(
       eventId,
-      { $push: { participant: participant._id } },
+      { $push: { participants: participant._id } },
       { new: true }
     );
     res.json(participant);
