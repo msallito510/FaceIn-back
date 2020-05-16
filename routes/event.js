@@ -323,21 +323,27 @@ router.get("/:eventId/register", checkIfLoggedIn, async (req, res, next) => {
   const findUser = await User.findById(_id);
   const participantId = findUser._id;
   try {
-    const participant = await Participant.create({
-      participant: participantId,
-      event: eventId,
-    });
-    await User.findByIdAndUpdate(
-      participantId,
-      { $push: { participantEvents: participant._id } },
-      { new: true }
-    );
-    await Event.findByIdAndUpdate(
-      eventId,
-      { $push: { participants: participant._id } },
-      { new: true }
-    );
-    res.json(participant);
+    const alreadyParticipantInEvent = await Participant.find({ participant: participantId, event: eventId });
+    console.log(alreadyParticipantInEvent)
+    if (alreadyParticipantInEvent.length === 0) {
+      const participant = await Participant.create({
+        participant: participantId,
+        event: eventId,
+      });
+      await User.findByIdAndUpdate(
+        participantId,
+        { $push: { participantEvents: participant._id } },
+        { new: true },
+      );
+      await Event.findByIdAndUpdate(
+        eventId,
+        { $push: { participants: participant._id } },
+        { new: true },
+      );
+      res.json(participant);
+    } else {
+      res.json({});
+    }
   } catch (error) {
     next(error);
   }
