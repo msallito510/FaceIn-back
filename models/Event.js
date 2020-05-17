@@ -32,11 +32,11 @@ const eventSchema = new Schema(
       required: [true, "Ooops: Date missing 🙂."],
     },
     timeStart: {
-      type: Number,
+      type: String,
       required: [true, "Ooops: Time missing 🙂."],
     },
     timeEnd: {
-      type: Number,
+      type: String,
       required: [true, "Ooops: Time missing 🙂."],
     },
     price: {
