@@ -12,8 +12,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// para admin y user
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const events = await Event.find()
@@ -41,8 +40,16 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// para admin y user
-// works
+router.get("/owner", checkIfLoggedIn, async (req, res, next) => {
+  const { _id } = req.session.currentUser;
+  try {
+    const onwerHasEvents = await Event.find({ owner: _id });
+    res.json(onwerHasEvents);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   const { eventId } = req.params;
   try {
@@ -192,7 +199,7 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-//TODO: solo para owner
+// TODO: solo para owner
 
 router.delete("/:eventId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -213,7 +220,7 @@ router.delete("/:eventId/delete", checkIfLoggedIn, async (req, res, next) => {
     if (userId.toString() === findEvent.owner._id.toString()) {
       const event = await Event.findByIdAndDelete(eventId);
       // falta chequearlo
-      // await User.findByIdAndUpdate(userId, { $pull: { eventsOwner: eventId } }, { new: true });
+      await User.findByIdAndUpdate(userId, { $pull: { eventsOwner: eventId } }, { new: true });
       // await Tag.findByIdAndUpdate(tagId, { $pull: { tagBelongsToEvents: eventId } }, { new: true });
       // await Rating.findByIdAndUpdate(ratingId, { $pull: { ratingForEvent: eventId } }, { new: true });
       // await Participant.findByIdAndUpdate(participantId, { $pull: { event: eventId } }, { new: true });
