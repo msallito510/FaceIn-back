@@ -57,8 +57,6 @@ router.get("/:placeId", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
 router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const {
@@ -92,7 +90,11 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
         { $push: { hasPlace: place._id } },
         { new: true }
       );
-      res.json(place);
+      if (place) {
+        res.json(place);
+      } else {
+        res.json({});
+      }
     }
   } catch (error) {
     // user puede crear solo una institucion
@@ -158,7 +160,7 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
     const userId = findUser._id;
     const { placeId } = req.params;
     const findPlace = await Place.findById(placeId);
-    // const eventId =
+    const eventId = await Event.findById(findPlace.placeHasEvents);
     // const ratingId =
     if (userId.toString() === findPlace.placeOwner._id.toString()) {
       const place = await Place.findByIdAndDelete(placeId);
@@ -168,7 +170,7 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
         { new: true }
       );
       // falta chequearlo
-      // await Event.findByIdAndUpdate(eventId, { $pull: { belongsToPlace: placeId } }, { new: true });
+      await Event.findByIdAndUpdate(eventId, { $pull: { belongsToPlace: placeId } }, { new: true });
       // await Rating.findByIdAndUpdate(ratingId, { $pull: { ratingForPlace: placeId } }, { new: true });
       res.json(place);
     } else {
