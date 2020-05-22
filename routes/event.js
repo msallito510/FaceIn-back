@@ -269,7 +269,7 @@ router.get("/:eventId/add-like", checkIfLoggedIn, async (req, res, next) => {
         const tempSameId = findEventWithLike.likes.filter(
           (like) => like.likeGivenBy._id.toString() === userId.toString()
         );
-        console.log(tempSameId.length === 0);
+        
         if (tempSameId.length === 0) {
           return true;
         } else {
