@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+
 const uploadSelfie = require("../middlewares/cloudinary");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
@@ -181,6 +183,48 @@ router.put(
     }
   }
 );
+
+router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+  const {
+    imgSrc,
+  } = req.body;
+  try {
+    const currentUser = await User.findById(_id);
+    if (currentUser._id.toString() === userId.toString()) {
+      const newImage = await User.findByIdAndUpdate(
+        userId,
+        { imageCam: imgSrc },
+        { new: true },
+      );
+      res.json(newImage);
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+  try {
+    const currentUser = await User.findById(_id);
+    const user = await User.findById(userId);
+    const binaryData = user.imageCam;
+    if (currentUser._id.toString() === userId.toString() && binaryData) {
+      const string = binaryData.toString('base64');
+      if (string) {
+        res.json(string);
+      } else {
+        res.json({});
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.put("/:userId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {
