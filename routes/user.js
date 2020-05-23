@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+
 const uploadSelfie = require("../middlewares/cloudinary");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
@@ -48,6 +50,41 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+// router.get("/userlikes", checkIfLoggedIn, async (req, res, next) => {
+//   try {
+//     const { _id } = req.session.currentUser;
+//     // const users = await User.find().populate({
+//     //   path: "likesGiven",
+//     //   match: { _id.toString },
+//     // });
+//     const users = await User.find({
+//       path: "likesGiven",
+//       match: { _id },
+//     });
+
+//     res.json(users);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+router.get("/userlikes", checkIfLoggedIn, async (req, res, next) => {
+  // const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+  try {
+    const user = await User.findById(_id)
+      .populate('likesGiven');
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/:userId", checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   try {
@@ -87,6 +124,32 @@ router.get("/:userId", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get("/:userId/likes", checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+
+  try {
+    const currentUser = await User.findById(_id);
+
+    if (currentUser._id.toString() === userId.toString()) {
+      const user = await User.findById(userId)
+        .populate({
+          path: "likesGiven",
+          populate: { path: "likeForEvent" },
+        });
+      if (user) {
+        res.json(user);
+      } else {
+        res.json({});
+      }
+    }
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 router.put(
   "/:userId/upload-photo",
   checkIfLoggedIn,
@@ -120,6 +183,48 @@ router.put(
     }
   }
 );
+
+router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+  const {
+    imgSrc,
+  } = req.body;
+  try {
+    const currentUser = await User.findById(_id);
+    if (currentUser._id.toString() === userId.toString()) {
+      const newImage = await User.findByIdAndUpdate(
+        userId,
+        { imageCam: imgSrc },
+        { new: true },
+      );
+      res.json(newImage);
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+  try {
+    const currentUser = await User.findById(_id);
+    const user = await User.findById(userId);
+    const binaryData = user.imageCam;
+    if (currentUser._id.toString() === userId.toString() && binaryData) {
+      const string = binaryData.toString('base64');
+      if (string) {
+        res.json(string);
+      } else {
+        res.json({});
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.put("/:userId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {

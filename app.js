@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser"); // not for netlify
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -37,16 +37,21 @@ const adminRouter = require("./routes/admin");
 
 const app = express();
 
-app.use(
-  cors({
-    credentials: true,
-    origin: [process.env.FRONTEND_DOMAIN],
-  })
-);
+app.set("trust proxy", true); // Netlify
+app.use(cors); // Netlify
+app.options("*", cors); // Netlify
+
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: [process.env.FRONTEND_DOMAIN],
+//   })
+// );
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(cookieParser()); // not for netlify
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
@@ -60,6 +65,8 @@ app.use(
     name: "ironhack",
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "none", // for netlify
+      secure: process.env.NODE_ENV === "production", // for netlify
     },
   })
 );

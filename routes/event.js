@@ -50,6 +50,20 @@ router.get("/owner", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+// router.get("/userLikes", checkIfLoggedIn, async (req, res, next) => {
+//   const { _id } = req.session.currentUser;
+//   try {
+//     const onwerHasEvents = await Event.find({ 
+//       likes: _id 
+
+//     });
+
+//     res.json(onwerHasEvents);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
 router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   const { eventId } = req.params;
   try {
@@ -255,7 +269,7 @@ router.get("/:eventId/add-like", checkIfLoggedIn, async (req, res, next) => {
         const tempSameId = findEventWithLike.likes.filter(
           (like) => like.likeGivenBy._id.toString() === userId.toString()
         );
-        console.log(tempSameId.length === 0);
+
         if (tempSameId.length === 0) {
           return true;
         } else {

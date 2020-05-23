@@ -70,6 +70,9 @@ const userSchema = new Schema(
         ref: "Like",
       },
     ],
+    imageCam: {
+      type: Buffer,
+    },
   },
   {
     timestamps: {
