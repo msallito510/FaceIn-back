@@ -5,7 +5,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
-const cors = require("cors");
+const cors = require('cors')({ origin: true, credentials: true }); // deploy Netlify
 
 require("dotenv").config();
 
@@ -37,17 +37,6 @@ const adminRouter = require("./routes/admin");
 
 const app = express();
 
-app.set("trust proxy", true); // Netlify
-app.use(cors); // Netlify
-app.options("*", cors); // Netlify
-
-// app.use(
-//   cors({
-//     credentials: true,
-//     origin: [process.env.FRONTEND_DOMAIN],
-//   })
-// );
-
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -70,6 +59,22 @@ app.use(
     },
   })
 );
+
+app.set("trust proxy", true); // Netlify
+app.use(cors); // Netlify
+app.options("*", cors); // Netlify
+
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: [process.env.FRONTEND_DOMAIN],
+//   })
+// );
+
+app.use((req, res, next) => {
+  app.locals.currentUser = req.session.currentUser;
+  next();
+});
 
 app.use("/", authRouter);
 app.use("/api/users", usersRouter);

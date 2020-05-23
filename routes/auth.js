@@ -22,6 +22,8 @@ router.post(
   checkUsernameAndPasswordNotEmpty,
   async (req, res, next) => {
     const { username, password, email } = res.locals.auth;
+    // const { username, password, email } = req.body;
+
     try {
       const user = await User.findOne({ username });
       if (user) {
