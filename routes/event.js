@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const uploadEventImage = require("../middlewares/cloudinary");
+
 const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
@@ -96,8 +98,8 @@ router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
+
+
 router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const {
@@ -154,8 +156,46 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
+router.put(
+  '/:eventId/upload-photo',
+  checkIfLoggedIn,
+  uploadEventImage.single('imageUrl'),
+  async (req, res, next) => {
+    const { _id } = req.session.currentUser;
+    const { eventId } = req.params;
+    try {
+      console.log("req.file.url ===>", req.file)
+      if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+      }
+      const currentUser = await User.findById(_id);
+      const findEvent = await Event.findById(eventId);
+      if (currentUser._id.toString() === findEvent.owner._id.toString()) {
+        
+        const imgPath = req.file.url;
+
+        console.log("imgPath ===>", imgPath)
+
+        if (!req.file) {
+          next(new Error('No file uploaded!'));
+          return;
+        }
+        const eventUpdate = await Event.findByIdAndUpdate(
+          eventId,
+          {
+            image: imgPath,
+          },
+          { new: true },
+        );
+        res.json(eventUpdate);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
 router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
@@ -176,7 +216,7 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
       timeStart,
       timeEnd,
       price,
-      // image,
+      image,
       tagId,
     } = req.body;
     if (userId.toString() === findEvent.owner._id.toString()) {
@@ -191,7 +231,7 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
           timeStart,
           timeEnd,
           price,
-          // image,
+          image,
           tags: tagId,
         },
         { new: true }

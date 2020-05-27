@@ -43,10 +43,9 @@ const eventSchema = new Schema(
       type: Number,
       default: 0.0,
     },
-    // image: {
-    //   type: String,
-    //   default: '',
-    // },
+    image: {
+      type: String,
+    },
     belongsToPlace: {
       type: ObjectId,
       ref: "Place",

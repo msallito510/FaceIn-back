@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
 
-const uploadSelfie = require("../middlewares/cloudinary");
+// const uploadSelfie = require("../middlewares/cloudinary");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
 
@@ -150,39 +150,39 @@ router.get("/:userId/likes", checkIfLoggedIn, async (req, res, next) => {
 });
 
 
-router.put(
-  "/:userId/upload-photo",
-  checkIfLoggedIn,
-  uploadSelfie.single("imageUrl"),
-  async (req, res, next) => {
-    const { _id } = req.session.currentUser;
-    const { userId } = req.params;
-    const imgPath = req.file.url;
-    const currentUser = await User.findById(_id);
-    try {
-      if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-        res.status(400).json({ message: "Specified id is not valid" });
-        return;
-      }
-      if (currentUser._id.toString() === userId.toString()) {
-        if (!req.file) {
-          next(new Error("No file uploaded!"));
-          return;
-        }
-        const userUpdate = await User.findByIdAndUpdate(
-          _id,
-          {
-            selfie: imgPath,
-          },
-          { new: true }
-        );
-        res.json(userUpdate);
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+// router.put(
+//   "/:userId/upload-photo",
+//   checkIfLoggedIn,
+//   uploadSelfie.single("imageUrl"),
+//   async (req, res, next) => {
+//     const { _id } = req.session.currentUser;
+//     const { userId } = req.params;
+//     const imgPath = req.file.url;
+//     const currentUser = await User.findById(_id);
+//     try {
+//       if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+//         res.status(400).json({ message: "Specified id is not valid" });
+//         return;
+//       }
+//       if (currentUser._id.toString() === userId.toString()) {
+//         if (!req.file) {
+//           next(new Error("No file uploaded!"));
+//           return;
+//         }
+//         const userUpdate = await User.findByIdAndUpdate(
+//           _id,
+//           {
+//             selfie: imgPath,
+//           },
+//           { new: true }
+//         );
+//         res.json(userUpdate);
+//       }
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
 router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
@@ -228,10 +228,7 @@ router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => 
       for (let i = 0; i < binaryData.length; ++i) {
         view[i] = binaryData[i];
       }
-      console.log(view)
-
       
-
       if (view) {
         res.json(test);
       } else {

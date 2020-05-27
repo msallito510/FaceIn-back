@@ -12,7 +12,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const participants = await Participant.find()
@@ -25,7 +25,7 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // para event-owner
-// works
+
 router.get("/:participantId", checkIfLoggedIn, async (req, res, next) => {
   const { participantId } = req.params;
   try {
@@ -43,7 +43,7 @@ router.get("/:participantId", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // solo owner of event
-// works
+
 router.put("/:participantId/scan", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.participantId)) {
@@ -72,7 +72,7 @@ router.put("/:participantId/scan", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
+
 router.delete(
   "/:participantId/delete",
   checkIfLoggedIn,

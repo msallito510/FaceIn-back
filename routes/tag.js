@@ -12,7 +12,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const tags = await Tag.find().populate("tagBelongsToEvents");
@@ -22,7 +22,7 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
+
 router.get("/:tagId", checkIfLoggedIn, async (req, res, next) => {
   const { tagId } = req.params;
   try {
@@ -38,7 +38,7 @@ router.get("/:tagId", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // solo admin puede subir tags nuevos
-// works
+
 router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   try {
     const { _id } = req.session.currentUser;
@@ -58,7 +58,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // solo admin
-// works
+
 router.delete("/:tagId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.tagId)) {
