@@ -1,7 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const uploadEventImage = require("../middlewares/cloudinary");
+const uploadMethods = require("../middlewares/cloudinary");
+
+const { uploadEventImage } = uploadMethods;
+
+// const uploadEventImage = require("../middlewares/cloudinary");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
 
@@ -156,6 +160,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+// test again just in case
 router.put(
   '/:eventId/upload-photo',
   checkIfLoggedIn,
@@ -172,7 +177,7 @@ router.put(
       const currentUser = await User.findById(_id);
       const findEvent = await Event.findById(eventId);
       if (currentUser._id.toString() === findEvent.owner._id.toString()) {
-        
+
         const imgPath = req.file.url;
 
         console.log("imgPath ===>", imgPath)

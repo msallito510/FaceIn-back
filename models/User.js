@@ -73,6 +73,9 @@ const userSchema = new Schema(
     imageCam: {
       type: Buffer,
     },
+    imageTwo: {
+      type: String,
+    },
   },
   {
     timestamps: {

@@ -1,23 +1,47 @@
-const express = require("express");
-const mongoose = require("mongoose");
+const express = require('express');
+const mongoose = require('mongoose');
+const axios = require('axios');
 
-const { checkIfLoggedIn } = require("../middlewares/index");
+const cloudinary = require('cloudinary');
+
+// const uploadMethods = require("../middlewares/cloudinary");
+
+// const { uploadParticipantPic } = uploadMethods;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const { checkIfLoggedIn } = require('../middlewares/index');
 
 const router = express.Router();
-const User = require("../models/User");
-const Event = require("../models/Event"); // populate
-const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
+const User = require('../models/User');
+const Event = require('../models/Event'); // populate
+const Tag = require('../models/Tag'); // populate
+const Like = require('../models/Like'); // populate
+const Rating = require('../models/Rating'); // populate
+const Participant = require('../models/Participant'); // populate
+const Place = require('../models/Place'); // populate
 
+const matchFaces = axios.create({
+  baseURL: process.env.FACE_BASE_URL,
+  headers: {
+    'content-type': 'application/json',
+    'x-rapidapi-host': 'macgyverapi-face-recognition-with-deep-learning-v1.p.rapidapi.com',
+    'x-rapidapi-key': 'e4e375db5bmshe7a40d73abb8cfep15a0acjsn0e6ece99cd6c',
+    accept: 'application/json',
+    useQueryString: true,
+  },
+  withCredentials: true,
+});
 
-router.get("/", checkIfLoggedIn, async (req, res, next) => {
+router.get('/', checkIfLoggedIn, async (req, res, next) => {
   try {
     const participants = await Participant.find()
-      .populate("participant")
-      .populate("event");
+      .populate('participant')
+      .populate('event');
     res.json(participants);
   } catch (error) {
     next(error);
@@ -26,12 +50,12 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
 
 // para event-owner
 
-router.get("/:participantId", checkIfLoggedIn, async (req, res, next) => {
+router.get('/:participantId', checkIfLoggedIn, async (req, res, next) => {
   const { participantId } = req.params;
   try {
     const participant = await Participant.findById(participantId)
-      .populate("participant")
-      .populate("event");
+      .populate('participant')
+      .populate('event');
     if (participant) {
       res.json(participant);
     } else {
@@ -44,20 +68,52 @@ router.get("/:participantId", checkIfLoggedIn, async (req, res, next) => {
 
 // solo owner of event
 
-router.put("/:participantId/scan", checkIfLoggedIn, async (req, res, next) => {
+router.put('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.participantId)) {
-      res.status(400).json({ message: "Specified id is not valid" });
+      res.status(400).json({ message: 'Specified id is not valid' });
       return;
     }
     const { participantId } = req.params;
     const { _id } = req.session.currentUser;
     const findUser = await User.findById(_id);
     const findEvent = await Participant.findById(participantId)
-      .populate("participant")
-      .populate("event");
+      .populate('participant')
+      .populate('event');
     const { faceScanned } = req.body;
+
+    const pics = await Participant.findById(participantId)
+      .populate('participant');
+
+    // const picOne = pics.participant.imageTwo;
+    // const picTwo = pics.entryImage;
+
+    const picOne = pics.participant.imageTwo;
+    const picTwo = pics.participant.imageTwo;
+
+    // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
+    // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
+    // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709148/profile/obama_letterman_fgpk3g.jpg';
+    // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709152/profile/barack_obama_emb35q.jpg';
+
+    // http://res.cloudinary.com/marcesallito/image/upload/v1590708025/profile/5eb6ea9e055c9d1404128bd4.jpg
+    // https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg
+
+    const matched = await matchFaces.post('/',
+      {
+        key: 'free',
+        id: '5B3p2r8A',
+        data: {
+          known_image: [picOne],
+          test_image: [picTwo],
+        },
+      },
+    );
+    console.log("image mached", matched);
+
     if (findUser._id.toString() === findEvent.event.owner._id.toString()) {
+      // if (matched) {
+      console.log('hi')
       const participant = await Participant.findByIdAndUpdate(
         participantId,
         {
@@ -66,28 +122,28 @@ router.put("/:participantId/scan", checkIfLoggedIn, async (req, res, next) => {
         { new: true }
       );
       res.json(participant);
+      // }
     }
   } catch (error) {
     next(error);
   }
 });
 
-
 router.delete(
-  "/:participantId/delete",
+  '/:participantId/delete',
   checkIfLoggedIn,
   async (req, res, next) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(req.params.participantId)) {
-        res.status(400).json({ message: "Specified id is not valid" });
+        res.status(400).json({ message: 'Specified id is not valid' });
         return;
       }
       const { participantId } = req.params;
       const { _id } = req.session.currentUser;
       const findUser = await User.findById(_id);
       const findEvent = await Participant.findById(participantId)
-        .populate("participant")
-        .populate("event");
+        .populate('participant')
+        .populate('event');
       const eventId = findEvent.event._id;
       const participant = findEvent.participant._id;
       if (findUser._id.toString() === findEvent.event.owner._id.toString()) {

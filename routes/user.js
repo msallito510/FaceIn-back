@@ -1,7 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+const cloudinary = require('cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// const uploadMethods = require("../middlewares/cloudinary");
+
+// const { uploadProfilePic } = uploadMethods;
+
+// const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
 
 // const uploadSelfie = require("../middlewares/cloudinary");
 
@@ -193,11 +205,25 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   try {
     const currentUser = await User.findById(_id);
     if (currentUser._id.toString() === userId.toString()) {
+
+      const getURL = await cloudinary.v2.uploader.upload(imgSrc,
+        {
+          folder: process.env.CLOUDINARY_FOLDER_TWO,
+          allowedFormats: ['jpg', 'png', 'jpeg'],
+          public_id: _id,
+          overwrite: true,
+        });
+      // console.log(getURL.secure_url)
+
       const newImage = await User.findByIdAndUpdate(
         userId,
-        { imageCam: imgSrc },
+        {
+          imageCam: imgSrc,
+          imageTwo: getURL.secure_url,
+        },
         { new: true },
       );
+      // console.log(getURL.url)
       res.json(newImage);
     } else {
       res.json({});
@@ -206,6 +232,8 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
+
+
 router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   const { _id } = req.session.currentUser;
@@ -228,7 +256,7 @@ router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => 
       for (let i = 0; i < binaryData.length; ++i) {
         view[i] = binaryData[i];
       }
-      
+
       if (view) {
         res.json(test);
       } else {

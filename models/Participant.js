@@ -22,6 +22,9 @@ const participantSchema = new Schema(
       default: false,
       required: true,
     },
+    entryImage: {
+      type: String,
+    },
   },
   {
     timestamps: {

@@ -102,8 +102,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-
-
 router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.placeId)) {
@@ -146,8 +144,6 @@ router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-
 
 router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
