@@ -6,19 +6,14 @@ const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
 const Event = require("../models/Event");
-const User = require("../models/User"); // populate
-const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
+const User = require("../models/User");
+const Rating = require("../models/Rating");
+const Place = require("../models/Place");
 
 const getCoordinates = axios.create({
   baseURL: process.env.GEOCODER_BASE_URL,
   withCredentials: true,
 });
-
-// para admin y user
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -34,8 +29,6 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// para admin y user
 
 router.get("/:placeId", checkIfLoggedIn, async (req, res, next) => {
   const { placeId } = req.params;
@@ -64,7 +57,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
     address,
     city,
     country,
-    // image,
   } = req.body;
   try {
     const user = await User.findById(_id);
@@ -78,7 +70,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
 
       const place = await Place.create({
         placeName,
-        // image,
         placeOwner: userId,
         address,
         city,
@@ -97,7 +88,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
       }
     }
   } catch (error) {
-    // user puede crear solo una institucion
     next(error);
   }
 });
@@ -115,7 +105,6 @@ router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
     const findPlace = await Place.findById(placeId);
     const {
       placeName,
-      // image,
       address,
       city,
       country,
@@ -130,7 +119,6 @@ router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
         placeId,
         {
           placeName,
-          // image,
           address,
           city,
           country,
@@ -157,7 +145,7 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
     const { placeId } = req.params;
     const findPlace = await Place.findById(placeId);
     const eventId = await Event.findById(findPlace.placeHasEvents);
-    // const ratingId =
+
     if (userId.toString() === findPlace.placeOwner._id.toString()) {
       const place = await Place.findByIdAndDelete(placeId);
       await User.findByIdAndUpdate(
@@ -165,7 +153,7 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
         { $pull: { hasPlace: placeId } },
         { new: true }
       );
-      // falta chequearlo
+      // TODO: testing
       await Event.findByIdAndUpdate(eventId, { $pull: { belongsToPlace: placeId } }, { new: true });
       // await Rating.findByIdAndUpdate(ratingId, { $pull: { ratingForPlace: placeId } }, { new: true });
       res.json(place);
@@ -176,9 +164,6 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// en postman, si no hay rating: post con 5 properties, si rating existe:
-// solo mandar: title, description, stars
 
 router.post("/:placeId/add-rating", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -259,8 +244,6 @@ router.post("/:placeId/add-rating", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// user cual dio el rating puede borrar
 
 router.delete(
   "/:placeId/delete-rating",
