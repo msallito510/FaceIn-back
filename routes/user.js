@@ -1,9 +1,21 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+const cloudinary = require('cloudinary');
 
-const uploadSelfie = require("../middlewares/cloudinary");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// const uploadMethods = require("../middlewares/cloudinary");
+
+// const { uploadProfilePic } = uploadMethods;
+
+// const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+
+// const uploadSelfie = require("../middlewares/cloudinary");
 
 const { checkIfLoggedIn } = require("../middlewares/index");
 
@@ -150,39 +162,39 @@ router.get("/:userId/likes", checkIfLoggedIn, async (req, res, next) => {
 });
 
 
-router.put(
-  "/:userId/upload-photo",
-  checkIfLoggedIn,
-  uploadSelfie.single("imageUrl"),
-  async (req, res, next) => {
-    const { _id } = req.session.currentUser;
-    const { userId } = req.params;
-    const imgPath = req.file.url;
-    const currentUser = await User.findById(_id);
-    try {
-      if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-        res.status(400).json({ message: "Specified id is not valid" });
-        return;
-      }
-      if (currentUser._id.toString() === userId.toString()) {
-        if (!req.file) {
-          next(new Error("No file uploaded!"));
-          return;
-        }
-        const userUpdate = await User.findByIdAndUpdate(
-          _id,
-          {
-            selfie: imgPath,
-          },
-          { new: true }
-        );
-        res.json(userUpdate);
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+// router.put(
+//   "/:userId/upload-photo",
+//   checkIfLoggedIn,
+//   uploadSelfie.single("imageUrl"),
+//   async (req, res, next) => {
+//     const { _id } = req.session.currentUser;
+//     const { userId } = req.params;
+//     const imgPath = req.file.url;
+//     const currentUser = await User.findById(_id);
+//     try {
+//       if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+//         res.status(400).json({ message: "Specified id is not valid" });
+//         return;
+//       }
+//       if (currentUser._id.toString() === userId.toString()) {
+//         if (!req.file) {
+//           next(new Error("No file uploaded!"));
+//           return;
+//         }
+//         const userUpdate = await User.findByIdAndUpdate(
+//           _id,
+//           {
+//             selfie: imgPath,
+//           },
+//           { new: true }
+//         );
+//         res.json(userUpdate);
+//       }
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
 router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
@@ -193,11 +205,25 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   try {
     const currentUser = await User.findById(_id);
     if (currentUser._id.toString() === userId.toString()) {
+
+      const getURL = await cloudinary.v2.uploader.upload(imgSrc,
+        {
+          folder: process.env.CLOUDINARY_FOLDER_TWO,
+          allowedFormats: ['jpg', 'png', 'jpeg'],
+          public_id: _id,
+          overwrite: true,
+        });
+      // console.log(getURL.secure_url)
+
       const newImage = await User.findByIdAndUpdate(
         userId,
-        { imageCam: imgSrc },
+        {
+          imageCam: imgSrc,
+          imageTwo: getURL.secure_url,
+        },
         { new: true },
       );
+      // console.log(getURL.url)
       res.json(newImage);
     } else {
       res.json({});
@@ -206,6 +232,42 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
+
+
+// router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => {
+//   const { userId } = req.params;
+//   const { _id } = req.session.currentUser;
+//   try {
+//     const currentUser = await User.findById(_id);
+//     const user = await User.findById(userId);
+//     const binaryData = user.imageCam;
+//     if (currentUser._id.toString() === userId.toString() && binaryData) {
+//       const string = binaryData.toString('base64');
+
+//       // const ab = new ArrayBuffer(128);
+//       // console.log(ab)
+//       // const two = new Float32Array(ab)
+//       // console.log(two)
+
+//       // function toArrayBuffer(binaryData) {
+//       //   console.log(binaryData)
+//       const ab = new ArrayBuffer(512);
+//       const view = new Float32Array(ab);
+//       for (let i = 0; i < binaryData.length; ++i) {
+//         view[i] = binaryData[i];
+//       }
+
+//       if (view) {
+//         res.json(test);
+//       } else {
+//         res.json({});
+//       }
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
 router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   const { _id } = req.session.currentUser;
@@ -215,6 +277,12 @@ router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
     const binaryData = user.imageCam;
     if (currentUser._id.toString() === userId.toString() && binaryData) {
       const string = binaryData.toString('base64');
+
+      // const ab = new ArrayBuffer(128);
+      // const two = new Float32Array(ab)
+      // console.log(two)
+
+
       if (string) {
         res.json(string);
       } else {

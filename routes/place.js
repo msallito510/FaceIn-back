@@ -19,7 +19,7 @@ const getCoordinates = axios.create({
 });
 
 // para admin y user
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const places = await Place.find()
@@ -36,7 +36,7 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // para admin y user
-// works
+
 router.get("/:placeId", checkIfLoggedIn, async (req, res, next) => {
   const { placeId } = req.params;
   try {
@@ -102,8 +102,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
 router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.placeId)) {
@@ -147,8 +145,6 @@ router.put("/:placeId/edit", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
 router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.placeId)) {
@@ -183,7 +179,7 @@ router.delete("/:placeId/delete", checkIfLoggedIn, async (req, res, next) => {
 
 // en postman, si no hay rating: post con 5 properties, si rating existe:
 // solo mandar: title, description, stars
-// works
+
 router.post("/:placeId/add-rating", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.placeId)) {
@@ -229,7 +225,6 @@ router.post("/:placeId/add-rating", checkIfLoggedIn, async (req, res, next) => {
       findPlaceWithRating.ratings.length === 0 ||
       (findPlaceWithRating.ratings.length !== 0 && userIdNotFound === true)
     ) {
-      console.log("uno");
       const rating = await Rating.create({
         title,
         description,
@@ -266,7 +261,7 @@ router.post("/:placeId/add-rating", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // user cual dio el rating puede borrar
-// works
+
 router.delete(
   "/:placeId/delete-rating",
   checkIfLoggedIn,

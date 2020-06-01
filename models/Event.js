@@ -43,20 +43,19 @@ const eventSchema = new Schema(
       type: Number,
       default: 0.0,
     },
-    // image: {
-    //   type: String,
-    //   default: '',
-    // },
+    image: {
+      type: String,
+    },
     belongsToPlace: {
       type: ObjectId,
       ref: "Place",
       required: [true, "Ooops: Place missing 🙂."],
     },
-    tag: {
-      type: ObjectId,
-      ref: "Tag",
-      required: [true, "Ooops: Tag missing 🙂."],
-    },
+    // tag: {
+    //   type: ObjectId,
+    //   ref: "Tag",
+    //   required: [true, "Ooops: Tag missing 🙂."],
+    // },
     participants: [
       {
         type: ObjectId,

@@ -12,7 +12,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const ratings = await Rating.find()
@@ -34,7 +34,7 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
+
 router.get("/:ratingId", checkIfLoggedIn, async (req, res, next) => {
   const { ratingId } = req.params;
   try {
@@ -66,7 +66,7 @@ router.get("/:ratingId", checkIfLoggedIn, async (req, res, next) => {
 });
 
 // event-owner o admin puede borrar rating
-// works
+
 router.delete("/:ratingId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.ratingId)) {

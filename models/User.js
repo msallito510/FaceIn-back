@@ -73,6 +73,10 @@ const userSchema = new Schema(
     imageCam: {
       type: Buffer,
     },
+    imageTwo: {
+      type: String,
+      default: 'https://res.cloudinary.com/marcesallito/image/upload/v1590929882/default/default_user_img.png',
+    },
   },
   {
     timestamps: {

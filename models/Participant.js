@@ -22,6 +22,12 @@ const participantSchema = new Schema(
       default: false,
       required: true,
     },
+    imageCamParticipant: {
+      type: Buffer,
+    },
+    entryImage: {
+      type: String,
+    },
   },
   {
     timestamps: {

@@ -1,12 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const uploadMethods = require("../middlewares/cloudinary");
+
+const { uploadEventImage } = uploadMethods;
+
+// const uploadEventImage = require("../middlewares/cloudinary");
+
 const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
 const Event = require("../models/Event");
 const User = require("../models/User"); // populate
-const Tag = require("../models/Tag"); // populate
+// const Tag = require("../models/Tag"); // populate
 const Like = require("../models/Like"); // populate
 const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
@@ -18,10 +24,10 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     const events = await Event.find()
       .populate("owner")
       .populate("belongsToPlace")
-      .populate({
-        path: "tag",
-        populate: { path: "tagBelongsToEvents" },
-      })
+      // .populate({
+      //   path: "tag",
+      //   populate: { path: "tagBelongsToEvents" },
+      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -70,10 +76,10 @@ router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
     const event = await Event.findById(eventId)
       .populate("owner")
       .populate("belongsToPlace")
-      .populate({
-        path: "tag",
-        populate: { path: "tagBelongsToEvents" },
-      })
+      // .populate({
+      //   path: "tag",
+      //   populate: { path: "tagBelongsToEvents" },
+      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -96,8 +102,6 @@ router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
 router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const {
@@ -110,7 +114,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
     timeEnd,
     price,
     // image,
-    tagId,
+    // tagId,
   } = req.body;
   try {
     const user = await User.findById(_id);
@@ -129,18 +133,18 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
         price,
         // image,
         belongsToPlace: placeId,
-        tag: tagId,
+        // tag: tagId,
       });
       await User.findByIdAndUpdate(
         userId,
         { $push: { eventsOwner: event._id } },
         { new: true }
       );
-      await Tag.findByIdAndUpdate(
-        tagId,
-        { $push: { tagBelongsToEvents: event._id } },
-        { new: true }
-      );
+      // await Tag.findByIdAndUpdate(
+      //   tagId,
+      //   { $push: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // );
       await Place.findByIdAndUpdate(
         placeId,
         { $push: { placeHasEvents: event._id } },
@@ -154,8 +158,47 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// solo para owner
-// works
+// test again just in case
+router.put(
+  '/:eventId/upload-photo',
+  checkIfLoggedIn,
+  uploadEventImage.single('imageUrl'),
+  async (req, res, next) => {
+    const { _id } = req.session.currentUser;
+    const { eventId } = req.params;
+    try {
+      console.log("req.file.url ===>", req.file)
+      if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+      }
+      const currentUser = await User.findById(_id);
+      const findEvent = await Event.findById(eventId);
+      if (currentUser._id.toString() === findEvent.owner._id.toString()) {
+
+        const imgPath = req.file.url;
+
+        console.log("imgPath ===>", imgPath)
+
+        if (!req.file) {
+          next(new Error('No file uploaded!'));
+          return;
+        }
+        const eventUpdate = await Event.findByIdAndUpdate(
+          eventId,
+          {
+            image: imgPath,
+          },
+          { new: true },
+        );
+        res.json(eventUpdate);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
 router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.eventId)) {
@@ -177,7 +220,7 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
       timeEnd,
       price,
       // image,
-      tagId,
+      // tagId,
     } = req.body;
     if (userId.toString() === findEvent.owner._id.toString()) {
       const event = await Event.findByIdAndUpdate(
@@ -192,20 +235,21 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
           timeEnd,
           price,
           // image,
-          tags: tagId,
+          // tags: tagId,
         },
         { new: true }
       );
-      await Tag.findOneAndUpdate(
-        { tagBelongsToEvents: event._id },
-        { $pull: { tagBelongsToEvents: event._id } },
-        { new: true }
-      );
-      await Tag.findByIdAndUpdate(
-        event.tag._id,
-        { $push: { tagBelongsToEvents: event._id } },
-        { new: true }
-      ).populate("tagBelongsToEvents");
+      // await Tag.findOneAndUpdate(
+      //   { tagBelongsToEvents: event._id },
+      //   { $pull: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // );
+      // await Tag.findByIdAndUpdate(
+      //   event.tag._id,
+      //   { $push: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // ).populate("tagBelongsToEvents");
+
       res.json(event);
     }
   } catch (error) {

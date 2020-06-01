@@ -12,7 +12,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// works
+
 router.delete("/:userId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
@@ -37,7 +37,7 @@ router.delete("/:userId/delete", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-// works
+
 router.delete(
   "/:eventId/admin-delete",
   checkIfLoggedIn,
@@ -68,7 +68,7 @@ router.delete(
   }
 );
 
-// works
+
 router.delete(
   "/:placeId/delete-admin",
   checkIfLoggedIn,

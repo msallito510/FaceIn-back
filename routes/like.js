@@ -11,7 +11,7 @@ const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
 const Place = require("../models/Place"); // populate
 
-// works
+
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
     const likes = await Like.find()
@@ -23,7 +23,7 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// works
+
 router.get("/:likeId", checkIfLoggedIn, async (req, res, next) => {
   const { likeId } = req.params;
   try {
