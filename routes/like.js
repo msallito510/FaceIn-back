@@ -3,14 +3,8 @@ const express = require("express");
 const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
-const User = require("../models/User");
-const Event = require("../models/Event"); // populate
-const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
 
+const Like = require("../models/Like");
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -22,7 +16,6 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
 
 router.get("/:likeId", checkIfLoggedIn, async (req, res, next) => {
   const { likeId } = req.params;
