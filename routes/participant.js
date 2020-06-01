@@ -130,6 +130,7 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
       );
 
       if (matched.data.match === true) {
+        console.log(" matches = ok ->> ", matched.data.match);
         const participant = await Participant.findByIdAndUpdate(
           participantId,
           {
@@ -139,7 +140,7 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
         );
 
         res.json(participant);
-      } else if (matched.data.matches === 0) {
+      } else if (!matched.data.match) {
         console.log(" matches = 0 ->> ", matched.data.matches);
 
         const participant = await Participant.findByIdAndUpdate(
