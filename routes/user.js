@@ -234,39 +234,39 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
 });
 
 
-router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => {
-  const { userId } = req.params;
-  const { _id } = req.session.currentUser;
-  try {
-    const currentUser = await User.findById(_id);
-    const user = await User.findById(userId);
-    const binaryData = user.imageCam;
-    if (currentUser._id.toString() === userId.toString() && binaryData) {
-      const string = binaryData.toString('base64');
+// router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => {
+//   const { userId } = req.params;
+//   const { _id } = req.session.currentUser;
+//   try {
+//     const currentUser = await User.findById(_id);
+//     const user = await User.findById(userId);
+//     const binaryData = user.imageCam;
+//     if (currentUser._id.toString() === userId.toString() && binaryData) {
+//       const string = binaryData.toString('base64');
 
-      // const ab = new ArrayBuffer(128);
-      // console.log(ab)
-      // const two = new Float32Array(ab)
-      // console.log(two)
+//       // const ab = new ArrayBuffer(128);
+//       // console.log(ab)
+//       // const two = new Float32Array(ab)
+//       // console.log(two)
 
-      // function toArrayBuffer(binaryData) {
-      //   console.log(binaryData)
-      const ab = new ArrayBuffer(512);
-      const view = new Float32Array(ab);
-      for (let i = 0; i < binaryData.length; ++i) {
-        view[i] = binaryData[i];
-      }
+//       // function toArrayBuffer(binaryData) {
+//       //   console.log(binaryData)
+//       const ab = new ArrayBuffer(512);
+//       const view = new Float32Array(ab);
+//       for (let i = 0; i < binaryData.length; ++i) {
+//         view[i] = binaryData[i];
+//       }
 
-      if (view) {
-        res.json(test);
-      } else {
-        res.json({});
-      }
-    }
-  } catch (error) {
-    next(error);
-  }
-});
+//       if (view) {
+//         res.json(test);
+//       } else {
+//         res.json({});
+//       }
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;

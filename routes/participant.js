@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
 const mongoose = require('mongoose');
 const axios = require('axios');
@@ -29,8 +30,8 @@ const matchFaces = axios.create({
   baseURL: process.env.FACE_BASE_URL,
   headers: {
     'content-type': 'application/json',
-    'x-rapidapi-host': 'macgyverapi-face-recognition-with-deep-learning-v1.p.rapidapi.com',
-    'x-rapidapi-key': 'e4e375db5bmshe7a40d73abb8cfep15a0acjsn0e6ece99cd6c',
+    'x-rapidapi-host': process.env.FACE_API_NAME,
+    'x-rapidapi-key': process.env.FACE_API_KEY,
     accept: 'application/json',
     useQueryString: true,
   },
@@ -66,63 +67,119 @@ router.get('/:participantId', checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get('/:participantId/get-photo', checkIfLoggedIn, async (req, res, next) => {
+  const { participantId } = req.params;
+  const { _id } = req.session.currentUser;
+  try {
+    const currentUser = await User.findById(_id);
+    const participant = await Participant.findById(participantId);
+    const binaryData = participant.imageCamParticipant;
+    if (currentUser._id.toString() === participantId.toString() && binaryData) {
+      const string = binaryData.toString('base64');
+
+      if (string) {
+        res.json(string);
+      } else {
+        res.json({});
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 // solo owner of event
 
-router.put('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
+router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
+  const { participantId } = req.params;
+  const { _id } = req.session.currentUser;
+  const {
+    imgSrc,
+  } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.participantId)) {
       res.status(400).json({ message: 'Specified id is not valid' });
       return;
     }
-    const { participantId } = req.params;
-    const { _id } = req.session.currentUser;
     const findUser = await User.findById(_id);
     const findEvent = await Participant.findById(participantId)
       .populate('participant')
       .populate('event');
-    const { faceScanned } = req.body;
 
-    const pics = await Participant.findById(participantId)
-      .populate('participant');
-
-    // const picOne = pics.participant.imageTwo;
-    // const picTwo = pics.entryImage;
-
-    const picOne = pics.participant.imageTwo;
-    const picTwo = pics.participant.imageTwo;
-
-    // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
-    // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
-    // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709148/profile/obama_letterman_fgpk3g.jpg';
-    // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709152/profile/barack_obama_emb35q.jpg';
-
-    // http://res.cloudinary.com/marcesallito/image/upload/v1590708025/profile/5eb6ea9e055c9d1404128bd4.jpg
-    // https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg
-
-    const matched = await matchFaces.post('/',
+    const getURL = await cloudinary.v2.uploader.upload(imgSrc,
       {
-        key: 'free',
-        id: '5B3p2r8A',
-        data: {
-          known_image: [picOne],
-          test_image: [picTwo],
-        },
+        folder: process.env.CLOUDINARY_FOLDER_THREE,
+        allowedFormats: ['jpg', 'png', 'jpeg'],
+        public_id: _id,
+        overwrite: true,
+      });
+    // console.log(getURL.secure_url)
+
+    await Participant.findByIdAndUpdate(
+      participantId,
+      {
+        imageCamParticipant: imgSrc,
+        entryImage: getURL.secure_url,
       },
+      { new: true },
     );
-    console.log("image mached", matched);
+    console.log("cloudinary image -> ", getURL.url);
 
     if (findUser._id.toString() === findEvent.event.owner._id.toString()) {
-      // if (matched) {
-      console.log('hi')
-      const participant = await Participant.findByIdAndUpdate(
-        participantId,
+      const pics = await Participant.findById(participantId)
+        .populate('participant');
+
+      const picOne = pics.participant.imageTwo;
+      const picTwo = pics.entryImage;
+
+
+      // const picOne = pics.participant.imageTwo;
+      // const picTwo = pics.participant.imageTwo;
+
+      console.log("image 1: ", picOne)
+      console.log("image 2: ", picTwo)
+      // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
+      // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
+      // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709148/profile/obama_letterman_fgpk3g.jpg';
+      // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709152/profile/barack_obama_emb35q.jpg';
+
+      const matched = await matchFaces.post('/',
         {
-          faceScanned,
+          key: 'free',
+          id: '5B3p2r8A',
+          data: {
+            known_image: [picOne],
+            test_image: [picTwo],
+          },
         },
-        { new: true }
       );
-      res.json(participant);
-      // }
+      console.log("image matched", matched.data);
+      console.log("matched Obj ->> ", matched.data);
+
+      if (matched.data.match === true) {
+        const participant = await Participant.findByIdAndUpdate(
+          participantId,
+          {
+            faceScanned: true,
+          },
+          { new: true }
+        );
+
+        res.json(participant);
+      } else if (matched.data.matches === 0) {
+        console.log(" matches = 0 ->> ", matched.data.matches);
+
+        const participant = await Participant.findByIdAndUpdate(
+
+          participantId,
+          {
+            faceScanned: false,
+          },
+          { new: true }
+        );
+
+        res.json(participant);
+      }
     }
   } catch (error) {
     next(error);

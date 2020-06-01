@@ -51,11 +51,11 @@ const eventSchema = new Schema(
       ref: "Place",
       required: [true, "Ooops: Place missing 🙂."],
     },
-    tag: {
-      type: ObjectId,
-      ref: "Tag",
-      required: [true, "Ooops: Tag missing 🙂."],
-    },
+    // tag: {
+    //   type: ObjectId,
+    //   ref: "Tag",
+    //   required: [true, "Ooops: Tag missing 🙂."],
+    // },
     participants: [
       {
         type: ObjectId,

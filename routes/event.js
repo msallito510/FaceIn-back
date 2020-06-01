@@ -12,7 +12,7 @@ const { checkIfLoggedIn } = require("../middlewares/index");
 const router = express.Router();
 const Event = require("../models/Event");
 const User = require("../models/User"); // populate
-const Tag = require("../models/Tag"); // populate
+// const Tag = require("../models/Tag"); // populate
 const Like = require("../models/Like"); // populate
 const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate
@@ -24,10 +24,10 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     const events = await Event.find()
       .populate("owner")
       .populate("belongsToPlace")
-      .populate({
-        path: "tag",
-        populate: { path: "tagBelongsToEvents" },
-      })
+      // .populate({
+      //   path: "tag",
+      //   populate: { path: "tagBelongsToEvents" },
+      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -76,10 +76,10 @@ router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
     const event = await Event.findById(eventId)
       .populate("owner")
       .populate("belongsToPlace")
-      .populate({
-        path: "tag",
-        populate: { path: "tagBelongsToEvents" },
-      })
+      // .populate({
+      //   path: "tag",
+      //   populate: { path: "tagBelongsToEvents" },
+      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -102,8 +102,6 @@ router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-
-
 router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const {
@@ -116,7 +114,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
     timeEnd,
     price,
     // image,
-    tagId,
+    // tagId,
   } = req.body;
   try {
     const user = await User.findById(_id);
@@ -135,18 +133,18 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
         price,
         // image,
         belongsToPlace: placeId,
-        tag: tagId,
+        // tag: tagId,
       });
       await User.findByIdAndUpdate(
         userId,
         { $push: { eventsOwner: event._id } },
         { new: true }
       );
-      await Tag.findByIdAndUpdate(
-        tagId,
-        { $push: { tagBelongsToEvents: event._id } },
-        { new: true }
-      );
+      // await Tag.findByIdAndUpdate(
+      //   tagId,
+      //   { $push: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // );
       await Place.findByIdAndUpdate(
         placeId,
         { $push: { placeHasEvents: event._id } },
@@ -221,8 +219,8 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
       timeStart,
       timeEnd,
       price,
-      image,
-      tagId,
+      // image,
+      // tagId,
     } = req.body;
     if (userId.toString() === findEvent.owner._id.toString()) {
       const event = await Event.findByIdAndUpdate(
@@ -236,21 +234,22 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
           timeStart,
           timeEnd,
           price,
-          image,
-          tags: tagId,
+          // image,
+          // tags: tagId,
         },
         { new: true }
       );
-      await Tag.findOneAndUpdate(
-        { tagBelongsToEvents: event._id },
-        { $pull: { tagBelongsToEvents: event._id } },
-        { new: true }
-      );
-      await Tag.findByIdAndUpdate(
-        event.tag._id,
-        { $push: { tagBelongsToEvents: event._id } },
-        { new: true }
-      ).populate("tagBelongsToEvents");
+      // await Tag.findOneAndUpdate(
+      //   { tagBelongsToEvents: event._id },
+      //   { $pull: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // );
+      // await Tag.findByIdAndUpdate(
+      //   event.tag._id,
+      //   { $push: { tagBelongsToEvents: event._id } },
+      //   { new: true }
+      // ).populate("tagBelongsToEvents");
+
       res.json(event);
     }
   } catch (error) {

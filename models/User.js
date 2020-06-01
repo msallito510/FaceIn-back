@@ -75,6 +75,7 @@ const userSchema = new Schema(
     },
     imageTwo: {
       type: String,
+      default: 'https://res.cloudinary.com/marcesallito/image/upload/v1590929882/default/default_user_img.png',
     },
   },
   {
