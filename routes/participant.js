@@ -5,10 +5,6 @@ const axios = require('axios');
 
 const cloudinary = require('cloudinary');
 
-// const uploadMethods = require("../middlewares/cloudinary");
-
-// const { uploadParticipantPic } = uploadMethods;
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -19,12 +15,8 @@ const { checkIfLoggedIn } = require('../middlewares/index');
 
 const router = express.Router();
 const User = require('../models/User');
-const Event = require('../models/Event'); // populate
-const Tag = require('../models/Tag'); // populate
-const Like = require('../models/Like'); // populate
-const Rating = require('../models/Rating'); // populate
-const Participant = require('../models/Participant'); // populate
-const Place = require('../models/Place'); // populate
+const Event = require('../models/Event');
+const Participant = require('../models/Participant');
 
 const matchFaces = axios.create({
   baseURL: process.env.FACE_BASE_URL,
@@ -48,8 +40,6 @@ router.get('/', checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// para event-owner
 
 router.get('/:participantId', checkIfLoggedIn, async (req, res, next) => {
   const { participantId } = req.params;
@@ -88,8 +78,6 @@ router.get('/:participantId/get-photo', checkIfLoggedIn, async (req, res, next) 
   }
 });
 
-// solo owner of event
-
 router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
   const { participantId } = req.params;
   const { _id } = req.session.currentUser;
@@ -113,7 +101,6 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
         public_id: _id,
         overwrite: true,
       });
-    // console.log(getURL.secure_url)
 
     await Participant.findByIdAndUpdate(
       participantId,
@@ -123,7 +110,6 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
       },
       { new: true },
     );
-    console.log("cloudinary image -> ", getURL.url);
 
     if (findUser._id.toString() === findEvent.event.owner._id.toString()) {
       const pics = await Participant.findById(participantId)
@@ -131,17 +117,6 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
 
       const picOne = pics.participant.imageTwo;
       const picTwo = pics.entryImage;
-
-
-      // const picOne = pics.participant.imageTwo;
-      // const picTwo = pics.participant.imageTwo;
-
-      console.log("image 1: ", picOne)
-      console.log("image 2: ", picTwo)
-      // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
-      // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590708257/profile/5eb6ea9e055c9d1404128bd4.jpg';
-      // const picOne = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709148/profile/obama_letterman_fgpk3g.jpg';
-      // const picTwo = 'https://res.cloudinary.com/marcesallito/image/upload/v1590709152/profile/barack_obama_emb35q.jpg';
 
       const matched = await matchFaces.post('/',
         {
@@ -153,8 +128,6 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
           },
         },
       );
-      console.log("image matched", matched.data);
-      console.log("matched Obj ->> ", matched.data);
 
       if (matched.data.match === true) {
         const participant = await Participant.findByIdAndUpdate(
@@ -162,7 +135,7 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
           {
             faceScanned: true,
           },
-          { new: true }
+          { new: true },
         );
 
         res.json(participant);
@@ -175,7 +148,7 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
           {
             faceScanned: false,
           },
-          { new: true }
+          { new: true },
         );
 
         res.json(participant);

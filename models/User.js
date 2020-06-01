@@ -34,14 +34,6 @@ const userSchema = new Schema(
     familyName: {
       type: String,
     },
-    // avatar: {
-    //   type: String,
-    //   default: '',
-    // },
-    selfie: {
-      type: String,
-      // required: [true, 'We need your selfie. Show us your best side 😃.'],
-    },
     hasPlace: {
       type: ObjectId,
       ref: "Place",
@@ -83,7 +75,7 @@ const userSchema = new Schema(
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);

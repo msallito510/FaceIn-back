@@ -6,7 +6,6 @@ const { checkIfLoggedIn } = require("../middlewares/index");
 const router = express.Router();
 const User = require("../models/User");
 const Event = require("../models/Event"); // populate
-const Tag = require("../models/Tag"); // populate
 const Like = require("../models/Like"); // populate
 const Rating = require("../models/Rating"); // populate
 const Participant = require("../models/Participant"); // populate

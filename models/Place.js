@@ -10,10 +10,6 @@ const placeSchema = new Schema(
       unique: [true, "Hey Admin, we already have this tag 😀."],
       required: [true, "Ooops: Place name missing 😀."],
     },
-    // image: {
-    //   type: String,
-    //   default: '',
-    // },
     placeOwner: {
       type: ObjectId,
       ref: "User",
@@ -46,16 +42,6 @@ const placeSchema = new Schema(
     coordinatesLatLong: {
       type: Object,
     },
-    // geometry: {
-    //   type: {
-    //     type: String,
-    //     default: "Point",
-    //   },
-    //   coordinates: {
-    //     type: [Number], // lng, lat
-    //     required: true,
-    //   },
-    // },
   },
   {
     timestamps: {
