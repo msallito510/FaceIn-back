@@ -5,12 +5,8 @@ const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
 const User = require("../models/User");
-const Event = require("../models/Event"); // populate
-const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
+const Rating = require("../models/Rating");
+const Place = require("../models/Place");
 
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
@@ -33,7 +29,6 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
 
 router.get("/:ratingId", checkIfLoggedIn, async (req, res, next) => {
   const { ratingId } = req.params;
@@ -64,8 +59,6 @@ router.get("/:ratingId", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// event-owner o admin puede borrar rating
 
 router.delete("/:ratingId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
