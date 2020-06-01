@@ -9,24 +9,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// const uploadMethods = require("../middlewares/cloudinary");
-
-// const { uploadProfilePic } = uploadMethods;
-
-// const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
-
-// const uploadSelfie = require("../middlewares/cloudinary");
-
 const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
 const User = require("../models/User");
-const Event = require("../models/Event"); // populate
-const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -62,26 +48,8 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// router.get("/userlikes", checkIfLoggedIn, async (req, res, next) => {
-//   try {
-//     const { _id } = req.session.currentUser;
-//     // const users = await User.find().populate({
-//     //   path: "likesGiven",
-//     //   match: { _id.toString },
-//     // });
-//     const users = await User.find({
-//       path: "likesGiven",
-//       match: { _id },
-//     });
-
-//     res.json(users);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
 router.get("/userlikes", checkIfLoggedIn, async (req, res, next) => {
-  // const { userId } = req.params;
+
   const { _id } = req.session.currentUser;
   try {
     const user = await User.findById(_id)
@@ -161,41 +129,6 @@ router.get("/:userId/likes", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-
-// router.put(
-//   "/:userId/upload-photo",
-//   checkIfLoggedIn,
-//   uploadSelfie.single("imageUrl"),
-//   async (req, res, next) => {
-//     const { _id } = req.session.currentUser;
-//     const { userId } = req.params;
-//     const imgPath = req.file.url;
-//     const currentUser = await User.findById(_id);
-//     try {
-//       if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-//         res.status(400).json({ message: "Specified id is not valid" });
-//         return;
-//       }
-//       if (currentUser._id.toString() === userId.toString()) {
-//         if (!req.file) {
-//           next(new Error("No file uploaded!"));
-//           return;
-//         }
-//         const userUpdate = await User.findByIdAndUpdate(
-//           _id,
-//           {
-//             selfie: imgPath,
-//           },
-//           { new: true }
-//         );
-//         res.json(userUpdate);
-//       }
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
-
 router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   const { _id } = req.session.currentUser;
@@ -213,7 +146,6 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
           public_id: _id,
           overwrite: true,
         });
-      // console.log(getURL.secure_url)
 
       const newImage = await User.findByIdAndUpdate(
         userId,
@@ -223,7 +155,6 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
         },
         { new: true },
       );
-      // console.log(getURL.url)
       res.json(newImage);
     } else {
       res.json({});
@@ -232,41 +163,6 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-
-// router.get('/:userId/get-photoBlob', checkIfLoggedIn, async (req, res, next) => {
-//   const { userId } = req.params;
-//   const { _id } = req.session.currentUser;
-//   try {
-//     const currentUser = await User.findById(_id);
-//     const user = await User.findById(userId);
-//     const binaryData = user.imageCam;
-//     if (currentUser._id.toString() === userId.toString() && binaryData) {
-//       const string = binaryData.toString('base64');
-
-//       // const ab = new ArrayBuffer(128);
-//       // console.log(ab)
-//       // const two = new Float32Array(ab)
-//       // console.log(two)
-
-//       // function toArrayBuffer(binaryData) {
-//       //   console.log(binaryData)
-//       const ab = new ArrayBuffer(512);
-//       const view = new Float32Array(ab);
-//       for (let i = 0; i < binaryData.length; ++i) {
-//         view[i] = binaryData[i];
-//       }
-
-//       if (view) {
-//         res.json(test);
-//       } else {
-//         res.json({});
-//       }
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
@@ -277,12 +173,6 @@ router.get('/:userId/get-photo', checkIfLoggedIn, async (req, res, next) => {
     const binaryData = user.imageCam;
     if (currentUser._id.toString() === userId.toString() && binaryData) {
       const string = binaryData.toString('base64');
-
-      // const ab = new ArrayBuffer(128);
-      // const two = new Float32Array(ab)
-      // console.log(two)
-
-
       if (string) {
         res.json(string);
       } else {
@@ -307,7 +197,6 @@ router.put("/:userId/edit", checkIfLoggedIn, async (req, res, next) => {
       email,
       firstName,
       familyName,
-      // avatar, selfie, password?? >> checkFieldsAreNotEmpty
     } = req.body;
     const currentUser = await User.findById(_id);
     if (currentUser._id.toString() === userId.toString()) {
@@ -319,7 +208,7 @@ router.put("/:userId/edit", checkIfLoggedIn, async (req, res, next) => {
           firstName,
           familyName,
         },
-        { new: true }
+        { new: true },
       );
       res.json(user);
     }
