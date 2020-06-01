@@ -11,12 +11,11 @@ const { checkIfLoggedIn } = require("../middlewares/index");
 
 const router = express.Router();
 const Event = require("../models/Event");
-const User = require("../models/User"); // populate
-// const Tag = require("../models/Tag"); // populate
-const Like = require("../models/Like"); // populate
-const Rating = require("../models/Rating"); // populate
-const Participant = require("../models/Participant"); // populate
-const Place = require("../models/Place"); // populate
+const User = require("../models/User");
+const Like = require("../models/Like");
+const Rating = require("../models/Rating");
+const Participant = require("../models/Participant");
+const Place = require("../models/Place");
 
 
 router.get("/", checkIfLoggedIn, async (req, res, next) => {
@@ -24,10 +23,6 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
     const events = await Event.find()
       .populate("owner")
       .populate("belongsToPlace")
-      // .populate({
-      //   path: "tag",
-      //   populate: { path: "tagBelongsToEvents" },
-      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -56,30 +51,12 @@ router.get("/owner", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
-// router.get("/userLikes", checkIfLoggedIn, async (req, res, next) => {
-//   const { _id } = req.session.currentUser;
-//   try {
-//     const onwerHasEvents = await Event.find({ 
-//       likes: _id 
-
-//     });
-
-//     res.json(onwerHasEvents);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
 router.get("/:eventId", checkIfLoggedIn, async (req, res, next) => {
   const { eventId } = req.params;
   try {
     const event = await Event.findById(eventId)
       .populate("owner")
       .populate("belongsToPlace")
-      // .populate({
-      //   path: "tag",
-      //   populate: { path: "tagBelongsToEvents" },
-      // })
       .populate({
         path: "ratings",
         populate: { path: "ratingGivenBy" },
@@ -113,8 +90,6 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
     timeStart,
     timeEnd,
     price,
-    // image,
-    // tagId,
   } = req.body;
   try {
     const user = await User.findById(_id);
@@ -131,20 +106,13 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
         timeStart,
         timeEnd,
         price,
-        // image,
         belongsToPlace: placeId,
-        // tag: tagId,
       });
       await User.findByIdAndUpdate(
         userId,
         { $push: { eventsOwner: event._id } },
         { new: true }
       );
-      // await Tag.findByIdAndUpdate(
-      //   tagId,
-      //   { $push: { tagBelongsToEvents: event._id } },
-      //   { new: true }
-      // );
       await Place.findByIdAndUpdate(
         placeId,
         { $push: { placeHasEvents: event._id } },
@@ -153,12 +121,10 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
       res.json(event);
     }
   } catch (error) {
-    // user tiene que crear antes una institucion para poder crear eventos
     next(error);
   }
 });
 
-// test again just in case
 router.put(
   '/:eventId/upload-photo',
   checkIfLoggedIn,
@@ -177,8 +143,6 @@ router.put(
       if (currentUser._id.toString() === findEvent.owner._id.toString()) {
 
         const imgPath = req.file.url;
-
-        console.log("imgPath ===>", imgPath)
 
         if (!req.file) {
           next(new Error('No file uploaded!'));
@@ -219,8 +183,6 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
       timeStart,
       timeEnd,
       price,
-      // image,
-      // tagId,
     } = req.body;
     if (userId.toString() === findEvent.owner._id.toString()) {
       const event = await Event.findByIdAndUpdate(
@@ -234,21 +196,9 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
           timeStart,
           timeEnd,
           price,
-          // image,
-          // tags: tagId,
         },
-        { new: true }
+        { new: true },
       );
-      // await Tag.findOneAndUpdate(
-      //   { tagBelongsToEvents: event._id },
-      //   { $pull: { tagBelongsToEvents: event._id } },
-      //   { new: true }
-      // );
-      // await Tag.findByIdAndUpdate(
-      //   event.tag._id,
-      //   { $push: { tagBelongsToEvents: event._id } },
-      //   { new: true }
-      // ).populate("tagBelongsToEvents");
 
       res.json(event);
     }
@@ -256,8 +206,6 @@ router.put("/:eventId/edit", checkIfLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
-
-// TODO: solo para owner
 
 router.delete("/:eventId/delete", checkIfLoggedIn, async (req, res, next) => {
   try {
@@ -270,7 +218,6 @@ router.delete("/:eventId/delete", checkIfLoggedIn, async (req, res, next) => {
     const userId = findUser._id;
     const { eventId } = req.params;
     const findEvent = await Event.findById(eventId);
-    // const tagId =
     // const ratingId =
     // const participantId =
     // const likeId =
