@@ -129,6 +129,32 @@ router.get("/:userId/likes", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get("/:userId/futureEvents", checkIfLoggedIn, async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.session.currentUser;
+
+  try {
+    const currentUser = await User.findById(_id);
+
+    if (currentUser._id.toString() === userId.toString()) {
+      const user = await User.findById(userId)
+        .populate({
+          path: "participantEvents",
+          populate: { path: "event" },
+        });
+      if (user) {
+        res.json(user);
+      } else {
+        res.json({});
+      }
+    }
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
   const { userId } = req.params;
   const { _id } = req.session.currentUser;
