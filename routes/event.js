@@ -41,6 +41,16 @@ router.get("/", checkIfLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get("/sort", checkIfLoggedIn, async (req, res, next) => {
+  try {
+    const events = await Event.find({}).sort({ numberOfLikes: 'desc' });
+ 
+    res.json(events);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/owner", checkIfLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   try {
