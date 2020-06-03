@@ -115,7 +115,7 @@ router.post('/:participantId/scan', checkIfLoggedIn, async (req, res, next) => {
       const pics = await Participant.findById(participantId)
         .populate('participant');
 
-      const picOne = pics.participant.imageTwo;
+      const picOne = pics.participant.imageUrl;
       const picTwo = pics.entryImage;
 
       const matched = await matchFaces.post('/',

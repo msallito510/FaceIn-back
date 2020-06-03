@@ -177,7 +177,7 @@ router.post('/:userId/add-photo', checkIfLoggedIn, async (req, res, next) => {
         userId,
         {
           imageCam: imgSrc,
-          imageTwo: getURL.secure_url,
+          imageUrl: getURL.secure_url,
         },
         { new: true },
       );

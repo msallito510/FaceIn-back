@@ -94,7 +94,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
   const {
     title,
     description,
-    frequency,
+    // frequency,
     dateStart,
     dateEnd,
     timeStart,
@@ -110,7 +110,7 @@ router.post("/add", checkIfLoggedIn, async (req, res, next) => {
         owner: userId,
         title,
         description,
-        frequency,
+        // frequency,
         dateStart,
         dateEnd,
         timeStart,
